@@ -1,0 +1,8 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/PollockAgent/PollockAgent.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/PollockAgent.Tests/PollockAgent.Tests.csproj" />
+  </Folder>
+</Solution>

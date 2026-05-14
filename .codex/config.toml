@@ -1,0 +1,13 @@
+# Codex CLI project config for PollockAgent.
+# Codex reads AGENTS.md at the repo root automatically; this file
+# documents project-scoped preferences.
+
+model = "gpt-5"
+approval_policy = "on-request"
+sandbox_mode = "workspace-write"
+
+[history]
+persistence = "save-all"
+
+[mcp_servers]
+# Add MCP servers here if desired.

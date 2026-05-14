@@ -1,0 +1,31 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '9.0.x'
+      - name: Skip if not yet scaffolded
+        id: check
+        run: |
+          if [ -f PollockAgent.sln ]; then
+            echo "ready=true" >> $GITHUB_OUTPUT
+          else
+            echo "ready=false" >> $GITHUB_OUTPUT
+            echo "::notice::No solution file yet — run /scaffold to initialize the project."
+          fi
+      - if: steps.check.outputs.ready == 'true'
+        run: dotnet restore
+      - if: steps.check.outputs.ready == 'true'
+        run: dotnet build --no-restore -c Release
+      - if: steps.check.outputs.ready == 'true'
+        run: dotnet test --no-build -c Release --verbosity normal
