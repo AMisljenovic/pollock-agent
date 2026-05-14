@@ -3,17 +3,29 @@ using PollockAgent.Canvas;
 using PollockAgent.Config;
 using PollockAgent.Llm;
 
-DotEnv.Load(".env");
+DotEnv.Load();
 
 var seed = IntentionSeed.Parse(args);
 
 var budget = int.TryParse(Environment.GetEnvironmentVariable("POLLOCK_LINE_BUDGET"), out var b)
     ? b
     : Constraints.Default.TotalLineBudget;
-var constraints = Constraints.Default with { TotalLineBudget = budget };
+var stepTimeout = int.TryParse(Environment.GetEnvironmentVariable("POLLOCK_STEP_TIMEOUT_SECONDS"), out var t)
+    ? TimeSpan.FromSeconds(t)
+    : Constraints.Default.StepTimeout;
+var language = Environment.GetEnvironmentVariable("POLLOCK_LANGUAGE")?.Trim();
+if (string.IsNullOrEmpty(language)) language = null;
+var constraints = Constraints.Default with
+{
+    TotalLineBudget = budget,
+    StepTimeout = stepTimeout,
+    Language = language
+};
 
 var canvasDir = Environment.GetEnvironmentVariable("POLLOCK_CANVAS_DIR");
-if (string.IsNullOrWhiteSpace(canvasDir)) canvasDir = "./canvas";
+if (string.IsNullOrWhiteSpace(canvasDir)) canvasDir = "canvas";
+if (!Path.IsPathRooted(canvasDir) && DotEnv.RootDirectory is { } root)
+    canvasDir = Path.GetFullPath(canvasDir, root);
 
 var canvas = new CodeCanvas(canvasDir, constraints.TotalLineBudget);
 var validator = new DripValidator(constraints);
@@ -32,6 +44,7 @@ var provider = Environment.GetEnvironmentVariable("LLM_PROVIDER") ?? "anthropic"
 Console.WriteLine($"seed: {seed.Phrase}");
 Console.WriteLine($"canvas: {Path.GetFullPath(canvasDir)}");
 Console.WriteLine($"provider: {provider}");
+Console.WriteLine($"language: {constraints.Language ?? "(unset — model will drift)"}");
 Console.WriteLine($"budget: {constraints.TotalLineBudget} lines, {constraints.MaxLinesPerDrip}/drip, {constraints.StepTimeout.TotalSeconds:0}s step timeout");
 Console.WriteLine();
 

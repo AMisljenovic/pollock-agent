@@ -54,13 +54,23 @@ src/PollockAgent/
   Llm/
     ILlmClient.cs
     AnthropicLlmClient.cs
+    OpenAiLlmClient.cs
+    LlmClientFactory.cs
+    Prompts.cs
+  Config/
+    DotEnv.cs
 tests/PollockAgent.Tests/
   PollockAgent.Tests.csproj
   DripValidatorTests.cs
   ... (more as you go)
 ```
 
-`ILlmClient` is the LLM abstraction. The default implementation calls the Anthropic Messages API at `https://api.anthropic.com/v1/messages` with model `claude-opus-4-7` (or current). Keep the client thin — raw `HttpClient` is fine; avoid heavyweight SDKs.
+`ILlmClient` is the LLM abstraction. Two implementations ship:
+
+- **`AnthropicLlmClient`** — default. Calls the Anthropic Messages API at `https://api.anthropic.com/v1/messages` with model `claude-opus-4-7` (or current). Raw `HttpClient`, no SDK.
+- **`OpenAiLlmClient`** — optional. Uses the official `OpenAI` NuGet package. Supports OpenAI-compatible endpoints (a custom base URL can be set via `OPENAI_BASE_URL`, so Azure OpenAI / OpenRouter / local LLMs work too).
+
+`LlmClientFactory` picks one based on `LLM_PROVIDER` (`anthropic` | `openai`, default `anthropic`). Config is read from a `.env` file at the repo root via the tiny `DotEnv` loader — no NuGet dependency for that.
 
 ## Style
 
@@ -95,10 +105,19 @@ dotnet test
 
 ## How to run (once implemented)
 
+Copy `.env.example` to `.env` and fill in keys for whichever provider you want, then:
+
 ```bash
-export ANTHROPIC_API_KEY=sk-ant-...
 dotnet run --project src/PollockAgent -- "a platform that grows"
 ```
+
+The `.env` file is discovered by walking up from the current working directory, so `dotnet run` works from either the repo root or `src/PollockAgent/`. Relevant keys:
+
+- `LLM_PROVIDER` — `anthropic` (default) or `openai`.
+- `ANTHROPIC_API_KEY` / `ANTHROPIC_MODEL` — used when provider is `anthropic`.
+- `OPENAI_API_KEY` / `OPENAI_MODEL` / `OPENAI_BASE_URL` — used when provider is `openai`. `OPENAI_BASE_URL` is optional and lets you point at any OpenAI-compatible endpoint.
+- `POLLOCK_LANGUAGE` — optional. Pin the agent to one programming language (`csharp`, `python`, `typescript`, `rust`, `go`, …). Without it, the model is not steered toward any language and tends to drift into HTML/poetry.
+- `POLLOCK_CANVAS_DIR` / `POLLOCK_LINE_BUDGET` / `POLLOCK_STEP_TIMEOUT_SECONDS` — optional runtime overrides.
 
 The canvas the runtime produces appears in `./canvas/` (gitignored).
 

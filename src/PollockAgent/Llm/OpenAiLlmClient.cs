@@ -16,7 +16,7 @@ class OpenAiLlmClient(ChatClient chat, Constraints constraints) : ILlmClient
         var completion = await chat.CompleteChatAsync(
             [
                 new SystemChatMessage(Prompts.System(constraints)),
-                new UserChatMessage(Prompts.User(seed, canvas))
+                new UserChatMessage(Prompts.User(seed, canvas, constraints))
             ],
             options,
             ct);

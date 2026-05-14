@@ -18,7 +18,7 @@ class AnthropicLlmClient(HttpClient http, Constraints constraints, string apiKey
                 Model: model,
                 MaxTokens: 1024,
                 System: Prompts.System(constraints),
-                Messages: [new AnthropicMessage("user", Prompts.User(seed, canvas))]))
+                Messages: [new AnthropicMessage("user", Prompts.User(seed, canvas, constraints))]))
         };
         request.Headers.Add("x-api-key", apiKey);
         request.Headers.Add("anthropic-version", "2023-06-01");

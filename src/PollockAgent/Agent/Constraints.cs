@@ -1,14 +1,16 @@
 namespace PollockAgent.Agent;
 
 record Constraints(
-    int MaxLinesPerDrip = 12,
+    int MaxLinesPerDrip = 100,
     TimeSpan StepTimeout = default,
-    int TotalLineBudget = 2000)
+    int TotalLineBudget = 2000,
+    string? Language = null)
 {
     public static readonly Constraints Default = new(
-        MaxLinesPerDrip: 12,
+        MaxLinesPerDrip: 100,
         StepTimeout: TimeSpan.FromSeconds(30),
-        TotalLineBudget: 2000);
+        TotalLineBudget: 2000,
+        Language: null);
 
     public static readonly string[] ForbiddenPhrases =
     [

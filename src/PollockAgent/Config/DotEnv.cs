@@ -2,9 +2,14 @@ namespace PollockAgent.Config;
 
 static class DotEnv
 {
-    public static void Load(string path)
+    public static string? RootDirectory { get; private set; }
+
+    public static void Load(string fileName = ".env")
     {
-        if (!File.Exists(path)) return;
+        var path = Find(fileName);
+        if (path is null) return;
+
+        RootDirectory = Path.GetDirectoryName(path);
 
         foreach (var raw in File.ReadAllLines(path))
         {
@@ -20,5 +25,17 @@ static class DotEnv
             if (Environment.GetEnvironmentVariable(key) is null)
                 Environment.SetEnvironmentVariable(key, value);
         }
+    }
+
+    static string? Find(string fileName)
+    {
+        var dir = new DirectoryInfo(Directory.GetCurrentDirectory());
+        while (dir is not null)
+        {
+            var candidate = Path.Combine(dir.FullName, fileName);
+            if (File.Exists(candidate)) return candidate;
+            dir = dir.Parent;
+        }
+        return null;
     }
 }

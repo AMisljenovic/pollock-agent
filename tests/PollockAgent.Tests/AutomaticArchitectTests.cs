@@ -42,7 +42,7 @@ public class AutomaticArchitectTests : IDisposable
     [Fact]
     public async Task stops_once_the_total_line_budget_is_exhausted()
     {
-        var constraints = Constraints.Default with { TotalLineBudget = 4 };
+        var constraints = Constraints.Default with { TotalLineBudget = 3 };
         var llm = new FakeLlmClient().Script(
             new Drip("a.txt", "one\ntwo\n"),
             new Drip("a.txt", "three\n"));

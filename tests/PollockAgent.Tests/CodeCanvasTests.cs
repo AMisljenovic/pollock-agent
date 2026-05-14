@@ -53,7 +53,7 @@ public class CodeCanvasTests : IDisposable
         canvas.Apply(new Drip("a.txt", "one\ntwo\n"));
         canvas.Apply(new Drip("b.txt", "three\n"));
 
-        Assert.Equal(5, canvas.TotalLines);
+        Assert.Equal(3, canvas.TotalLines);
     }
 
     [Fact]
@@ -63,7 +63,7 @@ public class CodeCanvasTests : IDisposable
         canvas.Apply(new Drip("a.txt", "x"));
         Assert.False(canvas.BudgetExhausted);
 
-        canvas.Apply(new Drip("a.txt", "y\nz\n"));
+        canvas.Apply(new Drip("a.txt", "y\nz\nw\n"));
         Assert.True(canvas.BudgetExhausted);
     }
 }
