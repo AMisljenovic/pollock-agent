@@ -37,6 +37,14 @@ public class PromptsTests
     }
 
     [Fact]
+    public void system_prompt_nudges_toward_many_small_files()
+    {
+        var prompt = Prompts.System(Constraints.Default);
+
+        Assert.Contains("many small files", prompt);
+    }
+
+    [Fact]
     public void user_prompt_omits_target_language_when_unset()
     {
         var canvas = new CodeCanvas(Path.GetTempPath(), 100);

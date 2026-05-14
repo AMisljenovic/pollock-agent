@@ -33,6 +33,10 @@ static class Prompts
               on the canvas. If the file shown in the canvas already contains "<html>", do NOT
               send "<html>" again — send only what comes after.
             - First drip for a file: start the file. Subsequent drips for that file: continue it.
+            - Prefer many small files over one large file. If you reference another module
+              (e.g. "from x import y", "require('./x')", "use crate::x", "using X;"), the next
+              drip should create or extend that referenced file. Do not let one file balloon
+              while imports stay unsatisfied.
             - Maximum {{constraints.MaxLinesPerDrip}} lines per drip. Hard limit. Count the lines in "content".
             - No planning comments: no "// TODO", "// FIXME", "// first I'll", "// step 1",
               "// next,", "// then,", "// plan:", "// roadmap".
